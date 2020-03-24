@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "ceb27a372f2f878f165feca64dfbda3e216a8cdec64ceea241e1341567f1d500"
+            "sha256": "580a4afe3ab00132bfa2d83d787b0051ad6dfea12b47b869270f9e21e025ab69"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -33,5 +33,10 @@
             "version": "==0.8.2"
         }
     },
-    "develop": {}
+    "develop": {
+        "photodl": {
+            "editable": true,
+            "path": "."
+        }
+    }
 }
