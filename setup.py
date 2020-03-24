@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="photodl",
-    version="0.0.1",
+    version="0.1.0",
     author="8F3E",
     description="A simple python package to download, sort and backup photos "
                 "from an SD card.",
