@@ -10,9 +10,9 @@ def main():
                                                  "tos from an SD card.")
 
     parser.add_argument("paths", metavar="path", type=str, nargs="+",
-                        help="A path to download, sort and backup.")
+                        help="Path(s) to download, sort and backup.")
 
-    parser.add_argument("--dest", type=str, required=True,
+    parser.add_argument("dest", type=str, nargs=1,
                         help="A path to copy sorted files to.")
 
     args = parser.parse_args()
@@ -25,7 +25,7 @@ def main():
     d = metadata.Dater(files)
     d.date()
 
-    s = filer.Sync(d.db, args.dest)
+    s = filer.Sync(d.db, args.dest[0])
     s.go()
 
 
