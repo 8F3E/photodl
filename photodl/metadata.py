@@ -26,11 +26,10 @@ class CarbonDating:
             print("Could not parse datetime from {0}.".format(self.url))
             return []
 
-        self.year = self.datetimeobj.year
-        self.month = self.datetimeobj.month
-        self.day = self.datetimeobj.day
-
-        return [self.url, self.year, self.month, self.day]
+        return {"url": self.url,
+                "year": self.datetimeobj.year,
+                "month": self.datetimeobj.month,
+                "day": self.datetimeobj.day}
 
 
 class Dater:
