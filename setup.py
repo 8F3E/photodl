@@ -16,6 +16,11 @@ setuptools.setup(
     install_requires=[
         "exif"
     ],
+    entry_points={
+        "console_scripts": [
+            "photodl = photodl.__main__:main"
+        ]
+    },
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
