@@ -44,5 +44,5 @@ class Dater:
             self.carbondater = CarbonDating(url)
             dated = self.carbondater.date()
 
-            if dated.len() > 0:
+            if len(dated) > 0:
                 self.db.append(dated)
