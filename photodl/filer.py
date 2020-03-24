@@ -1,6 +1,11 @@
+from pathlib import Path
+from shutil import copyfile
+
+
 class Sync():
-    def __init__(self, files):
+    def __init__(self, files, dest):
         self.filestosort = files
+        self.dest = dest
         self.sorted = {}
 
     def sort(self):
@@ -16,4 +21,23 @@ class Sync():
             else:
                 self.sorted[y] = {u: [file]}
 
-        return self.sorted
+    # def dedupe(self):
+    #     for year in self.sorted:
+    #         for dirprefix in self.sorted[year]:
+    #             p = Path(self.dest) / Path(year) / Path(dirprefix)
+    #             if p.exists() and p.isdir():
+    #                 self.sorted[year].pop(dirprefix, None)
+
+    def go(self):
+        self.sort()
+        # self.dedupe()
+
+        for year in self.sorted:
+            for dirprefix in self.sorted[year]:
+                for file in self.sorted[year][dirprefix]:
+                    oldp = Path(file["url"])
+                    name = oldp.name
+                    newdir = Path(self.dest) / Path(year) / Path(dirprefix)
+                    newdir.mkdir(parents=True, exist_ok=True)
+                    newp = newdir / Path(name)
+                    copyfile(file["url"], str(newp.resolve()))
