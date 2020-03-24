@@ -34,10 +34,18 @@ class Sync():
 
         for year in self.sorted:
             for dirprefix in self.sorted[year]:
+                eventtitle = input("Event name for {0}: ".format(dirprefix))
                 for file in self.sorted[year][dirprefix]:
                     oldp = Path(file["url"])
-                    name = oldp.name
-                    newdir = Path(self.dest) / Path(year) / Path(dirprefix)
+                    if eventtitle != "":
+                        prefix = dirprefix + "_" + eventtitle
+                    else:
+                        prefix = dirprefix
+                    name = prefix + "_" + oldp.name
+                    newdir = Path(self.dest)\
+                        / Path(year)\
+                        / Path(prefix)\
+                        / Path("RAW")
                     newdir.mkdir(parents=True, exist_ok=True)
                     newp = newdir / Path(name)
                     copyfile(file["url"], str(newp.resolve()))
