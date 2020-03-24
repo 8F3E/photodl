@@ -39,6 +39,8 @@ class Sync():
         return hasher.hexdigest()
 
     def dedupe(self):
+        realfilestosort = []
+
         for file in self.filestosort:
             file["blake2b"] = self.hashfile(file["url"])
 
@@ -47,9 +49,12 @@ class Sync():
         if self.destdbdumppath.exists():
             with open(self.destdbdumppath.resolve(), "r") as destdbdump:
                 self.destdb = destdbdump.read().splitlines()
+
             for file in self.filestosort:
-                if file["blake2b"] in self.destdb:
-                    self.filestosort.pop(self.filestosort.index(file))
+                if file["blake2b"] not in self.destdb:
+                    realfilestosort.append(file)
+
+            self.filestosort = realfilestosort
 
     def copy(self):
         for year in self.sorted:
