@@ -1,7 +1,9 @@
+import sys
+
+
 def main():
     import argparse
     from pathlib import Path
-    from photodl import metadata
     from photodl import filer
 
     parser = argparse.ArgumentParser(prog="photodl",
@@ -10,10 +12,17 @@ def main():
                                                  "tos from an SD card.")
 
     parser.add_argument("paths", metavar="path", type=str, nargs="+",
-                        help="Path(s) to download, sort and backup.")
+                        help="Path(s) to download, sort and backup from.")
 
     parser.add_argument("dest", type=str, nargs=1,
-                        help="A path to copy sorted files to.")
+                        help="Path to copy sorted files to.")
+
+    parser.add_argument("--backup", type=str, help="Path to backup files to. "
+                                                   "(You really should...)")
+
+    if len(sys.argv) == 1:
+        parser.print_help(sys.stderr)
+        sys.exit(1)
 
     args = parser.parse_args()
     files = []
@@ -22,11 +31,9 @@ def main():
         p = Path(path).glob("**/*")
         files += [str(x.resolve()) for x in p if x.is_file()]
 
-    d = metadata.Dater(files)
-    d.date()
-
-    s = filer.Sync(d.db, args.dest[0])
-    s.go()
+    f = filer.Filer(files, args.dest[0], args.backup)
+    f.go()
+    sys.exit(0)
 
 
 if __name__ == "__main__":
