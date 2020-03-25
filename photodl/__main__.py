@@ -13,7 +13,9 @@ def main():
                         help="Path(s) to download, sort and backup.")
 
     parser.add_argument("dest", type=str, nargs=1,
-                        help="A path to copy sorted files to.")
+                        help="Path to copy sorted files to.")
+
+    parser.add_argument("--backup", type=str, help="Path to backup files to.")
 
     args = parser.parse_args()
     files = []
@@ -27,6 +29,12 @@ def main():
 
     s = filer.Sync(d.db, args.dest[0])
     s.go()
+
+    print(args)
+
+    if args.backup is not None:
+        b = filer.Backup(d.db, args.backup)
+        b.zip()
 
 
 if __name__ == "__main__":
