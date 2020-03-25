@@ -7,7 +7,7 @@ INFO = crayons.blue("❖  FYI       ")
 
 
 def title():
-    print(crayons.white("photodl v.0.2.0", bold=True))
+    print(crayons.white("photodl v1.0.0", bold=True))
     print()
 
 
