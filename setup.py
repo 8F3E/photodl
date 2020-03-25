@@ -14,7 +14,8 @@ setuptools.setup(
     url="https://github.com/8F3E/photodl",
     packages=setuptools.find_packages(),
     install_requires=[
-        "exif"
+        "exif",
+        "crayons"
     ],
     entry_points={
         "console_scripts": [

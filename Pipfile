@@ -8,6 +8,7 @@ photodl = {editable = true,path = "."}
 
 [packages]
 exif = "*"
+crayons = "*"
 
 [requires]
 python_version = "3.8"
