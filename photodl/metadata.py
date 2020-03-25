@@ -14,34 +14,32 @@ class CarbonDating:
             return []
 
         try:
-            self.datetimestr = self.img.datetime
+            datetimestr = self.img.datetime
         except AttributeError:
             print("{0} does not contain EXIF datetime data.".format(self.url))
             return []
 
         try:
-            self.datetimeobj = datetime.strptime(self.datetimestr,
-                                                 "%Y:%m:%d %H:%M:%S")
+            datetimeobj = datetime.strptime(datetimestr, "%Y:%m:%d %H:%M:%S")
         except ValueError:
             print("Could not parse datetime from {0}.".format(self.url))
             return []
 
         return {"url": self.url,
-                "year": self.datetimeobj.year,
-                "month": self.datetimeobj.month,
-                "day": self.datetimeobj.day}
+                "year": datetimeobj.year,
+                "month": datetimeobj.month,
+                "day": datetimeobj.day}
 
 
 class Dater:
     def __init__(self, urls):
         self.urls = urls
         self.db = []
-        self.carbondater = None
 
     def date(self):
         for url in self.urls:
-            self.carbondater = CarbonDating(url)
-            dated = self.carbondater.date()
+            carbondater = CarbonDating(url)
+            dated = carbondater.date()
 
             if len(dated) > 0:
                 self.db.append(dated)
