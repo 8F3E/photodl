@@ -1,6 +1,9 @@
 from hashlib import blake2b
 from pathlib import Path
 from shutil import copyfile
+from datetime import datetime
+import os
+import zipfile
 
 
 class Sync():
@@ -85,3 +88,32 @@ class Sync():
         self.sort()
         self.copy()
         self.dumpdb()
+
+
+class Backup():
+    def __init__(self, filelist, dest):
+        self.files = filelist
+        self.dest = dest
+
+    def namer(self):
+        date = datetime.strftime(datetime.now(), "%Y-%m-%d_%H-%M-%S")
+        name = input("Name this backup: ")
+
+        if name != "":
+            filename = "{0}_{1}.zip".format(date, name)
+        else:
+            filename = "{0}.zip".format(date)
+
+        return Path(self.dest) / Path(filename)
+
+    def zip(self):
+        file = self.namer()
+        file.parent.mkdir(parents=True, exist_ok=True)
+        urls = [x["url"] for x in self.files]
+        common = os.path.commonpath(urls)
+        with zipfile.ZipFile(file.resolve(),
+                             "a",
+                             compression=zipfile.ZIP_STORED,
+                             compresslevel=9) as zf:
+            for f in self.files:
+                zf.write(f["url"], arcname=f["url"][len(common):])
