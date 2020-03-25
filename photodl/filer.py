@@ -6,6 +6,7 @@ import os
 import zipfile
 from photodl import metadata
 
+
 class Sync():
     bufsize = 262144
 
@@ -51,10 +52,10 @@ class Sync():
 
         if self.destdbdumppath.exists():
             with open(self.destdbdumppath.resolve(), "r") as destdbdump:
-                self.destdb = destdbdump.read().splitlines()
+                destdb = destdbdump.read().splitlines()
 
             for file in self.filestosort:
-                if file["blake2b"] not in self.destdb:
+                if file["blake2b"] not in destdb:
                     realfilestosort.append(file)
 
             self.filestosort = realfilestosort
