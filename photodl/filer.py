@@ -4,7 +4,7 @@ from shutil import copyfile
 from datetime import datetime
 import os
 import zipfile
-
+from photodl import metadata
 
 class Sync():
     bufsize = 262144
@@ -117,3 +117,21 @@ class Backup():
                              compresslevel=9) as zf:
             for f in self.files:
                 zf.write(f["url"], arcname=f["url"][len(common):])
+
+
+class Filer():
+    def __init__(self, files, dest, backup):
+        self.files = files
+        self.dest = dest
+        self.backup = backup
+
+    def go(self):
+        d = metadata.Dater(self.files)
+        d.date()
+
+        s = Sync(d.db, self.dest)
+        s.go()
+
+        if self.backup is not None:
+            b = Backup(d.db, self.backup)
+            b.zip()

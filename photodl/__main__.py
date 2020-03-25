@@ -1,7 +1,6 @@
 def main():
     import argparse
     from pathlib import Path
-    from photodl import metadata
     from photodl import filer
 
     parser = argparse.ArgumentParser(prog="photodl",
@@ -24,17 +23,8 @@ def main():
         p = Path(path).glob("**/*")
         files += [str(x.resolve()) for x in p if x.is_file()]
 
-    d = metadata.Dater(files)
-    d.date()
-
-    s = filer.Sync(d.db, args.dest[0])
-    s.go()
-
-    print(args)
-
-    if args.backup is not None:
-        b = filer.Backup(d.db, args.backup)
-        b.zip()
+    f = filer.Filer(files, args.dest[0], args.backup)
+    f.go()
 
 
 if __name__ == "__main__":
