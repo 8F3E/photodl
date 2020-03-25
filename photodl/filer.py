@@ -4,7 +4,8 @@ from shutil import copyfile
 from datetime import datetime
 import os
 import zipfile
-from photodl import metadata
+from photodl import metadata, cmd
+from photodl.cmd import printout, tellme, title
 
 
 class Sync():
@@ -15,6 +16,8 @@ class Sync():
         self.dest = dest
 
     def sort(self):
+        printout("Sorting files by date.", cmd.INFO)
+
         self.sorted = {}
 
         for file in self.filestosort:
@@ -30,6 +33,9 @@ class Sync():
             else:
                 self.sorted[y] = {u: [file]}
 
+        printout("Done!", cmd.SUCCESS)
+        return
+
     def hashfile(self, file):
         hasher = blake2b()
 
@@ -43,6 +49,8 @@ class Sync():
         return hasher.hexdigest()
 
     def dedupe(self):
+        printout("Detecting files that have already been copied.", cmd.INFO)
+
         realfilestosort = []
 
         for file in self.filestosort:
@@ -60,10 +68,15 @@ class Sync():
 
             self.filestosort = realfilestosort
 
+        printout("Done!", cmd.SUCCESS)
+        return
+
     def copy(self):
+        printout("Copying files.", cmd.INFO)
+
         for year in self.sorted:
             for dirprefix in self.sorted[year]:
-                eventtitle = input("Event name for {0}: ".format(dirprefix))
+                eventtitle = tellme("Name {0}'s event:".format(dirprefix))
                 for file in self.sorted[year][dirprefix]:
                     oldp = Path(file["url"])
                     if eventtitle != "":
@@ -79,16 +92,24 @@ class Sync():
                     newp = newdir / Path(name)
                     copyfile(file["url"], str(newp.resolve()))
 
+        printout("Done!", cmd.SUCCESS)
+        return
+
     def dumpdb(self):
         with open(self.destdbdumppath.resolve(), "a") as destdbdump:
             for file in self.filestosort:
                 destdbdump.write("{0}\n".format(str(file["blake2b"])))
+        return
 
     def go(self):
         self.dedupe()
-        self.sort()
-        self.copy()
-        self.dumpdb()
+        if self.filestosort != []:
+            self.sort()
+            self.copy()
+            self.dumpdb()
+        else:
+            printout("No new dated image files to copy!", cmd.INFO)
+        return
 
 
 class Backup():
@@ -98,26 +119,36 @@ class Backup():
 
     def namer(self):
         date = datetime.strftime(datetime.now(), "%Y-%m-%d_%H-%M-%S")
-        name = input("Name this backup: ")
+        name = tellme("Name this backup:")
 
         if name != "":
             filename = "{0}_{1}.zip".format(date, name)
         else:
             filename = "{0}.zip".format(date)
 
-        return Path(self.dest) / Path(filename)
+        p = Path(self.dest) / Path(filename)
+        printout("Saving backup at {0}".format(p), cmd.INFO)
+        return p
 
     def zip(self):
-        file = self.namer()
-        file.parent.mkdir(parents=True, exist_ok=True)
-        urls = [x["url"] for x in self.files]
-        common = os.path.commonpath(urls)
-        with zipfile.ZipFile(file.resolve(),
-                             "a",
-                             compression=zipfile.ZIP_STORED,
-                             compresslevel=9) as zf:
-            for f in self.files:
-                zf.write(f["url"], arcname=f["url"][len(common):])
+        if self.files == []:
+            printout("Nothing to backup!", cmd.INFO)
+        else:
+            printout("Generating zipped backup.", cmd.INFO)
+            file = self.namer()
+            file.parent.mkdir(parents=True, exist_ok=True)
+            urls = [x["url"] for x in self.files]
+            common = os.path.commonpath(urls)
+
+            with zipfile.ZipFile(file.resolve(),
+                                 "a",
+                                 compression=zipfile.ZIP_STORED,
+                                 compresslevel=9) as zf:
+                for f in self.files:
+                    zf.write(f["url"], arcname=f["url"][len(common):])
+
+            printout("Done!", cmd.SUCCESS)
+            return
 
 
 class Filer():
@@ -127,6 +158,8 @@ class Filer():
         self.backup = backup
 
     def go(self):
+        title()
+
         d = metadata.Dater(self.files)
         d.date()
 
@@ -134,5 +167,8 @@ class Filer():
         s.go()
 
         if self.backup is not None:
-            b = Backup(d.db, self.backup)
+            b = Backup(s.filestosort, self.backup)
             b.zip()
+
+        print()
+        printout("All done!", cmd.SUCCESS)
